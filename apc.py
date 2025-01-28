@@ -47,29 +47,44 @@ def set_active_profile(profile):
 @click.argument('profile', required=False)
 def cli(profile):
     """Simple CLI to switch between AWS profiles."""
-    profiles = get_aws_profiles()
+    try:
+        profiles = get_aws_profiles()
+        
+        if not profiles:
+            click.echo("No AWS profiles found in ~/.aws/credentials")
+            return
+        
+        if not profile:
+            questions = [
+                inquirer.List('profile',
+                             message="Select AWS Profile",
+                             choices=profiles,
+                             ),
+            ]
+            try:
+                answers = inquirer.prompt(questions)
+                if answers is None:  # This happens when user presses Ctrl+C
+                    click.echo("\nOperation cancelled")
+                    return
+                profile = answers['profile']
+            except KeyboardInterrupt:
+                click.echo("\nOperation cancelled")
+                return
+        
+        if profile not in profiles:
+            click.echo(f"Profile '{profile}' not found. Available profiles:")
+            for p in profiles:
+                click.echo(f"  - {p}")
+            return
+        
+        if set_active_profile(profile):
+            click.echo(f"Switched to AWS profile: {profile}")
+        else:
+            click.echo(f"Failed to switch to profile: {profile}")
     
-    if not profiles:
-        click.echo("No AWS profiles found in ~/.aws/credentials")
+    except KeyboardInterrupt:
+        click.echo("\nOperation cancelled")
         return
-    
-    if not profile:
-        # If no profile is specified, show available profiles
-        click.echo("Available AWS profiles:")
-        for p in profiles:
-            click.echo(f"  - {p}")
-        return
-    
-    if profile not in profiles:
-        click.echo(f"Profile '{profile}' not found. Available profiles:")
-        for p in profiles:
-            click.echo(f"  - {p}")
-        return
-    
-    if set_active_profile(profile):
-        click.echo(f"Switched to AWS profile: {profile}")
-    else:
-        click.echo(f"Failed to switch to profile: {profile}")
 
 if __name__ == '__main__':
     cli()
