@@ -19,7 +19,7 @@ This tool helps you manage multiple AWS profiles by:
 
 ```bash
 pip install click
-pip install click
+pip install inquirer
 ```
 
 2. Save the script as `apc.py`
