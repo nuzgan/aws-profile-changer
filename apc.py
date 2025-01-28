@@ -4,6 +4,7 @@ import click
 import configparser
 import os
 from pathlib import Path
+import inquirer
 
 def get_aws_profiles():
     """Get list of available AWS profiles from credentials file."""

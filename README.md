@@ -19,6 +19,7 @@ This tool helps you manage multiple AWS profiles by:
 
 ```bash
 pip install click
+pip install click
 ```
 
 2. Save the script as `apc.py`
